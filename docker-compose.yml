@@ -1,0 +1,6 @@
+  fastapi:
+    build: .
+    ports:
+      - 80:80
+    volumes:
+      - ./shipmonk_packer:/code/shipmonk_packer
