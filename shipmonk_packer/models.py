@@ -14,7 +14,7 @@ example_boxes = [{"id": "3x2x1", "width": 3.0, "height": 2.0, "length": 1.0, "ma
                  ]
 
 
-class Item(BaseModel):
+class ShipmonkItem(BaseModel):
     width: float
     height: float
     length: float
@@ -32,7 +32,7 @@ class Box(BaseModel):
 
 class Order(BaseModel):
     order_id: str = Field(example="89456")
-    items: List[Item] = Field(example=example_items)
+    items: List[ShipmonkItem] = Field(example=example_items)
     boxes: List[Box] = Field(example=example_boxes)
 
 

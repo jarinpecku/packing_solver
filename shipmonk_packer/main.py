@@ -4,6 +4,7 @@ import logging
 from fastapi import FastAPI
 
 from shipmonk_packer.models import Order, PackerResponse
+from shipmonk_packer.packer import ShipmonkPacker
 
 
 log = logging.getLogger()
@@ -24,5 +25,9 @@ def app_status() -> dict:
 
 
 @app.post("/order", response_model=PackerResponse)
-def post_order(order: Order) -> dict:
-    return dict(order_id=order.order_id, suitable_boxes=["box1", "box2"])
+def post_order(order: Order) -> PackerResponse:
+    log.debug("New order: %s", order)
+    packer = ShipmonkPacker()
+    response = dict(order_id=order.order_id, suitable_boxes=[])
+    response["suitable_boxes"] += packer.pack(order)
+    return response
