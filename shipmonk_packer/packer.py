@@ -38,4 +38,6 @@ class ShipmonkPacker:
         self._add_boxes(order.boxes)
         self._add_items(order.items)
         self._packer.pack()
-        return self._get_suitable_boxes()
+        suitable_boxes = self._get_suitable_boxes()
+        self._packer = Packer()
+        return suitable_boxes

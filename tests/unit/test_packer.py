@@ -1,11 +1,11 @@
 import os
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 sys.path.append(str(Path(os.path.dirname(__file__)).parents[1]))
 
-from shipmonk_packer.packer import ShipmonkPacker
+from shipmonk_packer.packer import ShipmonkPacker, Packer
 from shipmonk_packer.models import Box, ShipmonkItem, Order
 
 
@@ -64,7 +64,6 @@ def test__get_suitable_boxes():
     bin3.name = "box3"
 
     packer = ShipmonkPacker()
-    packer._packer = MagicMock()
     packer._packer.bins = [bin1, bin2, bin3]
 
     assert packer._get_suitable_boxes() == ["box1", "box3"]
@@ -84,7 +83,7 @@ def test_pack():
         items=[{"width": 0.9, "height": 0.9, "length": 0.9, "weight": 3, "quantity": 3},
                {"width": 1.0, "height": 1.0, "length": 1.0, "weight": 5, "quantity": 1},
                {"width": 0.3, "height": 1.0, "length": 2.55, "weight": 3, "quantity": 1},
-                {"width": 1.0, "height": 1.0, "length": 2.0, "weight": 3, "quantity": 2}],
+               {"width": 1.0, "height": 1.0, "length": 2.0, "weight": 3, "quantity": 2}],
         boxes=[{"id": "3x2x1", "width": 3.0, "height": 2.0, "length": 1.0, "max_weight": 50},
                {"id": "5x4x2", "width": 5.0, "height": 4.0, "length": 2.0, "max_weight": 50},
                {"id": "6x6x6", "width": 6.0, "height": 6.0, "length": 6.0, "max_weight": 50}]
@@ -93,13 +92,14 @@ def test_pack():
     packer = ShipmonkPacker()
     packer._add_boxes = MagicMock()
     packer._add_items = MagicMock()
-    packer._packer = MagicMock()
+    packer_mock = MagicMock()
+    packer._packer = packer_mock
     packer._get_suitable_boxes = MagicMock(return_value=["box1", "box2"])
 
     assert packer.pack(order) == ["box1", "box2"]
     packer._add_boxes.assert_called_once_with(order.boxes)
     packer._add_items.assert_called_once_with(order.items)
-    packer._packer.pack.assert_called_once()
+    packer_mock.pack.assert_called_once()
     packer._get_suitable_boxes.assert_called_once()
 
 
