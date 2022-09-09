@@ -1,6 +1,7 @@
 import requests
 import csv
 from pytest_subtests import subtests
+import time
 
 
 BASE_URL = "http://127.0.0.1"
@@ -34,14 +35,20 @@ with open("orders.csv") as csvfile:
             print(err)
 
 
-
 def test_success(subtests):
+    timeouts = []
     for id, items in orders.items():
         data = dict(order_id=id, items=items, boxes=boxes)
         with subtests.test(message=id):
+            start_time = time.time()
             response = requests.post(url=f"{BASE_URL}/order", json=data)
+            duration = time.time() - start_time
+            if duration > 2:
+                timeouts.append(id)
+            assert duration < 2
             assert response.status_code == 200
             print(f"Order {id} response {response.json()}")
 
     print(f"detected {len(bad_rows)} rows with bad data")
     print(bad_rows)
+    print(id)
